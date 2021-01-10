@@ -6,8 +6,98 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+
+    <link type="text/css" href="../css/options.css" rel="stylesheet">
+    <link type="text/css" href="../library/bootstrap/bootstrap.css" rel="stylesheet">
+
+    <script type="text/javascript" src="../js/options.js"></script>
+    <script type="text/javascript" src="../library/jquery/jquery.js"></script>
+    <script type="text/javascript" src="../library/bootstrap/bootstrap.js"></script>
 </head>
 <body>
+<div class="container">
+    <div class="h1 py-4">Action builder</div>
+    <div class="row h-100">
+        <div class="col-3 tabs">
+            <div class="container">
+                <div class="row">
+                    Add new operation
+                </div>
+                <div class="row">
+                    Operations
+                </div>
+            </div>
+        </div>
 
+        <div class="col-9">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 form-group">
+                        <label for="title">Title</label>
+                        <input type="text" class="form-control" id="title">
+                    </div>
+                </div>
+                <div class="row horizontal-divider">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="launchType">Launch type</label>
+                            <select class="form-control" id="launchType">
+                                <option value="load" selected>On page loaded</option>
+                                <option value="key">On button pressed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="col-12 form-group">
+                            <label for="launchKeys">Launch keys</label>
+                            <input type="text" class="form-control" id="launchKeys" readonly disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="row horizontal-divider">
+                    <div class="col-12">
+                        <label for="pageRegex">Add page</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="pageRegex">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary">Add</button>
+                            </div>
+                        </div>
+                        <small>use regex [http:\/\/.*example.com\/item-.*]</small>
+                    </div>
+                    <div class="col-12 form-group mt-2">
+                        <label for="regExes">Pages</label>
+                        <select multiple class="form-control" id="regExes"></select>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-secondary">Change</button>
+                        <button class="btn btn-danger">Remove</button>
+                    </div>
+                </div>
+                <div class="row horizontal-divider mt-3">
+                    <div class="col-12">
+                        <label for="action">Action</label>
+                        <div class="input-group mb-2">
+                            <select class="form-control" id="action">
+                                <option>Click</option>
+                                <option>Download</option>
+                                <option>Wait</option>
+                                <option>Reload</option>
+                            </select>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary">
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="actions">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
