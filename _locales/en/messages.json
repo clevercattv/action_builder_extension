@@ -1,0 +1,8 @@
+{
+  "name": {
+    "message": "Action builder extension"
+  },
+  "description": {
+    "message": "Chrome extension for adding actions on web pages"
+  }
+}

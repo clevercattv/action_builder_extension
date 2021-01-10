@@ -1,0 +1,32 @@
+{
+"update_url": "https://clients2.google.com/service/update2/crx",
+
+  "name": "__MSG_name__",
+  "description": "__MSG_description__",
+  "version": "0.0.1",
+  "default_locale": "en",
+  "manifest_version": 2,
+  "permissions": [
+    "tabs",
+    "storage",
+    "webNavigation",
+    "<all_urls>",
+    "contextMenus"
+  ],
+  "options_page": "html/options.html",
+  "background": {
+    "scripts": ["js/background.js"],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*", "file://*/*"],
+      "css": ["css/options.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    "html/*",
+    "css/*",
+    "js/*"
+  ]
+}
