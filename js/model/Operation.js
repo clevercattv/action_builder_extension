@@ -4,12 +4,14 @@ class Operation {
      * @param {Launch} launch
      * @param {string} regExes
      * @param {Action[]} actions
-     * */
-    constructor(title, launch, regExes, actions) {
+     * @param {int} priority
+     */
+    constructor(title, launch, regExes, actions, priority) {
         this.title = title;
         this.launch = launch;
         this.regExes = regExes;
         this.actions = actions;
+        this.priority = priority;
     }
 
 }

@@ -65,13 +65,40 @@ const ui = (() => {
     }
 
     function addActionEvent() {
-        let addAction = document.getElementById('addAction');
-        let selectedAction = document.getElementById('selectedAction');
-        let actionsEl = document.getElementById('actions');
+        const addAction = document.getElementById('addAction');
+        const selectedAction = document.getElementById('selectedAction');
+        const actionsEl = document.getElementById('actions');
 
         addAction.addEventListener('click', async () => {
-            let action = actions[selectedAction.options.selectedIndex];
-            let element = await fetchActionBody(action.file);
+            const action = actions[selectedAction.options.selectedIndex];
+            const element = await ui_generator.action(action);
+
+            const removeAction = element.querySelector('#removeAction');
+            removeAction.addEventListener('click',
+                () => element.parentNode.removeChild(element));
+
+            const hideAction = element.querySelector('#hideAction');
+            hideAction.addEventListener('click', () => {
+                let cardBody = hideAction.parentElement.parentElement.querySelector('div[class*=card-body]');
+                cardBody.classList.contains('d-none') ? cardBody.classList.remove('d-none') : cardBody.classList.add('d-none');
+            });
+
+            const moveActionUp = element.querySelector('#moveActionUp');
+            moveActionUp.addEventListener('click', () => {
+                const prevIndex = Array.from(actionsEl.children).indexOf(element) - 1;
+                const previousElement = actionsEl.children[prevIndex];
+                if (!previousElement) return;
+                actionsEl.insertBefore(element, previousElement);
+            });
+
+            const moveActionDown = element.querySelector('#moveActionDown');
+            moveActionDown.addEventListener('click', () => {
+                const nextIndex = Array.from(actionsEl.children).indexOf(element) + 1;
+                const nextElement = actionsEl.children[nextIndex];
+                if (!nextElement) return;
+                actionsEl.insertBefore(nextElement, element);
+            });
+
             actionsEl.appendChild(element);
         });
     }
