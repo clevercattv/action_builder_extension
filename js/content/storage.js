@@ -21,18 +21,19 @@ const storage = (() => {
 
     /**
      * @param {Operation} operation
-     * @return {Promise<void>}
+     * @return {Promise<<Operation>[]>} result operations
      */
     const createOperation = async operation => {
         let operations = await getOperations();
         operations = operations ? operations : [];
         operations.push(operation);
         chrome.storage.local.set({operations});
+        return operations;
     }
 
     /**
      * @param {Operation} operation
-     * @return {Promise<void>}
+     * @return {Promise<<Operation>[]>} result operations
      */
     const removeOperation = async operation => {
         const operations = await getOperations();
@@ -41,6 +42,7 @@ const storage = (() => {
                 operation.regExes.some(regEx => regEx === oprRegEx)));
         operations.splice(operations.indexOf(filtered.pop()), 1);
         chrome.storage.local.set({operations});
+        return operations;
     }
 
     return {

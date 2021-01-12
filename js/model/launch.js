@@ -10,10 +10,9 @@ class Launch {
 class LaunchKeys extends Launch {
     /**
      * @param {string[]} keys
-     * @param {string} type
      */
-    constructor(keys, type) {
-        super(type);
+    constructor(keys) {
+        super('key');
         this.keys = keys;
     }
 }
