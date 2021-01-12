@@ -2,9 +2,9 @@ const ui_generator = (() => {
 
     const containerPath = 'html/action/action_container.html';
 
-    async function action({name, file}) {
+    async function action({name, type, file}) {
         const container = await fetchActionBody(containerPath);
-        container.setAttribute('data-action', name);
+        container.setAttribute('data-action', type);
 
         const actionName = container.querySelector('#actionName');
         actionName.innerHTML = name + actionName.innerHTML;
