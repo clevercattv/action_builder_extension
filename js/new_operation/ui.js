@@ -1,15 +1,21 @@
 const ui = (() => {
+    const elements = {
+        launchType: () => document.getElementById('launchType'),
+        launchKeys: () => document.getElementById('launchKeys'),
+        operationActions: () => document.getElementById('operationActions'),
+    }
+
     function init() {
         addLaunchTypeEvents();
         fillActionsSelect();
         addActionEvent();
         addPageRegExEvents();
-
+        addCreateOperationEvent();
     }
 
     function addLaunchTypeEvents() {
-        const launchKeys = document.getElementById('launchKeys');
-        const launchType = document.getElementById('launchType');
+        const launchKeys = elements.launchKeys();
+        const launchType = elements.launchType();
         launchType.addEventListener('change',
             () => launchKeys.disabled = launchType.value !== 'key')
         launchKeys.addEventListener('keydown', event => {
@@ -43,7 +49,7 @@ const ui = (() => {
         });
 
         const changePageRegEx = document.getElementById('changePageRegEx');
-        changePageRegEx.addEventListener('click', event => {
+        changePageRegEx.addEventListener('click', () => {
             pageRegEx.value = operationRegExes[regExes.options.selectedIndex]; // get first selected
             operationRegExes.splice(regExes.options.selectedIndex, 1);
         });
@@ -58,7 +64,7 @@ const ui = (() => {
     }
 
     function fillActionsSelect() {
-        let selectedAction = document.getElementById('selectedAction');
+        const selectedAction = document.getElementById('selectedAction');
         ui_generator.fillSelect(selectedAction, actions.map(action => {
             return {'innerText': action.name}
         }));
@@ -67,7 +73,7 @@ const ui = (() => {
     function addActionEvent() {
         const addAction = document.getElementById('addAction');
         const selectedAction = document.getElementById('selectedAction');
-        const actionsEl = document.getElementById('actions');
+        const actionsEl = elements.operationActions();
 
         addAction.addEventListener('click', async () => {
             const action = actions[selectedAction.options.selectedIndex];
@@ -79,7 +85,7 @@ const ui = (() => {
 
             const hideAction = element.querySelector('#hideAction');
             hideAction.addEventListener('click', () => {
-                let cardBody = hideAction.parentElement.parentElement.querySelector('div[class*=card-body]');
+                const cardBody = hideAction.parentElement.parentElement.querySelector('div[class*=card-body]');
                 cardBody.classList.contains('d-none') ? cardBody.classList.remove('d-none') : cardBody.classList.add('d-none');
             });
 
@@ -100,6 +106,29 @@ const ui = (() => {
             });
 
             actionsEl.appendChild(element);
+        });
+    }
+
+    function addCreateOperationEvent() {
+        const operationCreate = document.getElementById('operationCreate');
+        operationCreate.addEventListener('click', () => {
+            const launchType = elements.launchType();
+            const title = document.getElementById('operationTitle').value;
+            const launch = 'key' === launchType.value ?
+                new LaunchKeys(operationLaunchKeys) : new Launch(launchType.value);
+            const htmlActions = elements.operationActions();
+            const actions = Array.from(htmlActions.children)
+                .map(htmlAction => mapper.elementToAction[htmlAction.getAttribute('data-action')](htmlAction));
+            const priority = document.getElementById('operationPriority').value;
+
+            const operation = new Operation(
+                title,
+                launch,
+                operationRegExes,
+                actions,
+                priority > 0 ? priority : 1
+            );
+            storage.createOperation(operation).then(console.log);
         });
     }
 

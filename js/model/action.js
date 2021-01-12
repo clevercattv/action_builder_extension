@@ -28,6 +28,8 @@ class DownloadAction extends Action {
      */
     constructor(name, extension, selector) {
         super('Download image');
+        this.name = name;
+        this.extension = extension;
         this.selector = selector;
     }
 }

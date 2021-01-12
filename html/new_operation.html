@@ -14,6 +14,10 @@
     <script type="text/javascript" src="../library/bootstrap/bootstrap.js"></script>
 
     <script type="text/javascript" src="../js/model/action.js"></script>
+    <script type="text/javascript" src="../js/model/launch.js"></script>
+    <script type="text/javascript" src="../js/model/operation.js"></script>
+    <script type="text/javascript" src="../js/content/storage.js"></script>
+    <script type="text/javascript" src="../js/mapper.js"></script>
     <script type="text/javascript" src="../js/ui_generator.js"></script>
     <script type="text/javascript" src="../js/file_service.js"></script>
     <script type="text/javascript" src="../js/new_operation/ui.js"></script>
@@ -44,9 +48,13 @@
         <div class="col-9">
             <div class="container">
                 <div class="row">
-                    <div class="col-12 form-group">
-                        <label for="title">Title</label>
-                        <input type="text" class="form-control" id="title">
+                    <div class="col-9 form-group">
+                        <label for="operationTitle">Title</label>
+                        <input type="text" class="form-control" id="operationTitle">
+                    </div>
+                    <div class="col-3 form-group">
+                        <label for="operationPriority">Priority</label>
+                        <input max="99" value="1" min="1" type="number" class="form-control" id="operationPriority">
                     </div>
                 </div>
                 <div class="row horizontal-divider">
@@ -100,11 +108,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="row" id="actions">
+                <div class="row" id="operationActions">
 
                 </div>
                 <div class="row">
-                    <button type="submit" class="btn btn-primary mb-2 ml-auto mt-1">Create operation</button>
+                    <button type="submit" class="btn btn-primary mb-2 ml-auto mt-1" id="operationCreate">Create
+                        operation
+                    </button>
                 </div>
             </div>
         </div>
