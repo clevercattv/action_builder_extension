@@ -21,6 +21,8 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*", "file://*/*"],
+      "js": ["js/content/action_functions.js", "js/content/index.js",
+        "js/content/storage.js", "js/content/template_mapper.js"],
       "css": ["css/options.css"]
     }
   ],

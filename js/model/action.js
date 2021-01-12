@@ -22,10 +22,12 @@ class ClickAction extends Action {
 class DownloadAction extends Action {
 
     /**
+     * @param {string} name
+     * @param {string} extension
      * @param {string} selector
      */
-    constructor(selector) {
-        super('Download');
+    constructor(name, extension, selector) {
+        super('Download image');
         this.selector = selector;
     }
 }

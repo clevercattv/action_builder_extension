@@ -4,8 +4,8 @@ const actions = [
         'file': 'click.html',
     },
     {
-        'name': 'Download',
-        'file': 'download.html',
+        'name': 'Download image',
+        'file': 'download_image.html',
     },
     {
         'name': 'Wait',

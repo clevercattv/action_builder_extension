@@ -2,7 +2,7 @@ class Operation {
     /**
      * @param {string} title
      * @param {Launch} launch
-     * @param {string} regExes
+     * @param {string[]} regExes
      * @param {Action[]} actions
      * @param {int} priority
      */
