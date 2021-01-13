@@ -20,6 +20,17 @@ const storage = (() => {
     }
 
     /**
+     * @param {string} id
+     * @return {Promise<Operation>}
+     */
+    const getOperationById = async (id) => {
+        const operations = await getOperations();
+        return Array.from(operations)
+            .filter(operation => operation.id === id)
+            .pop();
+    }
+
+    /**
      * @param {Operation} operation
      * @return {Promise<<Operation>[]>} result operations
      */
@@ -37,9 +48,7 @@ const storage = (() => {
      */
     const removeOperation = async operation => {
         const operations = await getOperations();
-        const filtered = operations.filter(opr => opr.title === operation.title)
-            .filter(opr => opr.regExes.every(oprRegEx =>
-                operation.regExes.some(regEx => regEx === oprRegEx)));
+        const filtered = operations.filter(opr => opr.id === operation.id);
         operations.splice(operations.indexOf(filtered.pop()), 1);
         chrome.storage.local.set({operations});
         return operations;
@@ -47,8 +56,9 @@ const storage = (() => {
 
     return {
         getOperations,
+        getOperationById,
         getCurrentSiteOperation,
         createOperation,
-        removeOperation
+        removeOperation,
     }
 })()

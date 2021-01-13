@@ -1,6 +1,6 @@
 const ui_generator = (() => {
-
     const containerPath = 'html/action/action_container.html';
+    const operationCardPath = 'html/operation_card.html';
 
     async function action({name, type, file}) {
         const container = await fetchActionBody(containerPath);
@@ -24,8 +24,35 @@ const ui_generator = (() => {
         })
     }
 
+    async function operationCard({title, launch, regExes, actions, priority}) {
+        const card = await fetchActionBody(operationCardPath);
+
+        const cardHeader = card.querySelector('[class*=card-header]');
+        cardHeader.innerText = `${title} [priority: ${priority}]`;
+
+        const cardTitle = card.querySelector('[class*=card-title]');
+        cardTitle.innerText = `Launch type: ${launch.type} ${launch.type === 'key' ? '[' + launch.keys + ']' : ''}`;
+
+        const cardRegExes = card.querySelector('#regExes');
+        regExes.forEach(regEx => {
+            let li = document.createElement('li');
+            li.innerText = regEx;
+            cardRegExes.appendChild(li);
+        });
+
+        const cardActions = card.querySelector('#actions');
+        actions.forEach(act => {
+            let li = document.createElement('li');
+            li.innerText = act.type;
+            cardActions.appendChild(li);
+        });
+
+        return card;
+    }
+
     return {
         fillSelect,
-        action
+        action,
+        operationCard
     };
 })()

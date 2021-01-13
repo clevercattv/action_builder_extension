@@ -7,7 +7,7 @@ const mapper = (() => {
             element.querySelector('#selector').value
         ),
         'wait': (element) => new WaitAction(Number.parseInt(element.querySelector('#ms').value)),
-        'reload': (_) => new Action('Reload'),
+        'reload': (_) => new Action('reload'),
     }
 
     return {

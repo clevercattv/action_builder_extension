@@ -14,7 +14,7 @@ class ClickAction extends Action {
      * @param {string} selector
      */
     constructor(selector) {
-        super('Click');
+        super('click');
         this.selector = selector;
     }
 }
@@ -27,7 +27,7 @@ class DownloadAction extends Action {
      * @param {string} selector
      */
     constructor(name, extension, selector) {
-        super('Download image');
+        super('downloadImage');
         this.name = name;
         this.extension = extension;
         this.selector = selector;
@@ -40,7 +40,7 @@ class WaitAction extends Action {
      * @param {int} ms
      */
     constructor(ms) {
-        super('Wait');
+        super('wait');
         this.ms = ms;
     }
 }
