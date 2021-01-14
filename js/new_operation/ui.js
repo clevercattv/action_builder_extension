@@ -1,122 +1,181 @@
 const newOperationUi = (() => {
-    const hardcodedActionsInfo = [
-        {
-            'name': 'Click',
-            'type': 'click',
-            'file': 'click.html',
-        },
-        {
-            'name': 'Download image',
-            'type': 'downloadImage',
-            'file': 'download_image.html',
-        },
-        {
-            'name': 'Wait',
-            'type': 'wait',
-            'file': 'wait.html',
-        },
-        {
-            'name': 'Reload',
-            'type': 'reload',
-            'file': 'reload.html',
-        },
-    ].map(action => {
-        action.file = 'html/action/' + action.file;
-        return action;
-    });
-
     const operationLaunchKeys = [];
     const operationRegExes = [];
-    const elements = {
-        launchType: () => document.getElementById('launchType'),
-        launchKeys: () => document.getElementById('launchKeys'),
-        operationActions: () => document.getElementById('operationActions'),
-    }
+    /**
+     * Contains all interactive elements. (without generated elements!!!)
+     * @type {Object<string, Element>}
+     */
+    const elements = {};
 
-    function init() {
-        addLaunchTypeEvents();
-        fillActionsSelect();
-        addActionButtonEvent();
-        addPageRegExEvents();
-        addCreateOperationEvent();
-    }
+    /**
+     * Contains all event listeners functions. (without generated events!!!)
+     * @type {Object<string, Function>}
+     */
+    const events = {};
 
-    function addLaunchTypeEvents() {
-        const launchKeys = elements.launchKeys();
-        const launchType = elements.launchType();
-        launchType.addEventListener('change',
-            () => launchKeys.disabled = launchType.value !== 'key')
-        launchKeys.addEventListener('keydown', event => {
-            if (event.key === 'Backspace') {
-                operationLaunchKeys.pop();
-            } else if (operationLaunchKeys.length < 3) {
-                operationLaunchKeys.push(event.key);
-            }
-            launchKeys.value = operationLaunchKeys.length ? operationLaunchKeys.reduce((prev, next) => {
-                prev = prev + ' + ' + next;
-                return prev;
-            }) : '';
-        })
-    }
+    /**
+     * Initialize elements and events variables
+     */
+    const init = () => Object.entries(
+        {
+            launchTypeSelect: {
+                selector: '#launchType',
+                event: changeLaunchTypeEvent,
+                eventType: 'change'
+            },
+            launchKeysInput: {
+                selector: '#launchKeys',
+                event: editLaunchKeysEvent,
+                eventType: 'keydown'
+            },
+            createRegExButton: {
+                selector: '#addPageRegEx',
+                event: addRegExEvent,
+                eventType: 'click'
+            },
+            changeRegExButton: {
+                selector: '#changePageRegEx',
+                event: changeRegExEvent,
+                eventType: 'click'
+            },
+            removeRegExButton: {
+                selector: '#removePageRegEx',
+                event: removeRegExEvent,
+                eventType: 'click'
+            },
+            addActionButton: {
+                selector: '#addAction',
+                event: addActionEvent,
+                eventType: 'click'
+            },
+            createOperationButton: {
+                selector: '#createOperation',
+                event: createOperationEvent,
+                eventType: 'click'
+            },
+            actionSelect: {
+                selector: '#action',
+            },
+            actionsElements: {
+                selector: '#actions'
+            },
+            regExesSelect: {
+                selector: '#regExes'
+            },
+            regExInput: {
+                selector: '#pageRegEx'
+            },
+            operationTitleInput: {
+                selector: '#operationTitle'
+            },
+            operationPriorityInput: {
+                selector: '#operationPriority'
+            },
+        }
+    ).forEach(entry => {
+        const key = entry[0];
+        const value = entry[1];
+        elements[key] = document.querySelector(value.selector);
+        if (value.event) {
+            events[key] = () => elements[key].addEventListener(value.eventType, value.event);
+        }
+    });
 
-    function addPageRegExEvents() {
-        const regExes = document.getElementById('regExes');
-        const pageRegEx = document.getElementById('pageRegEx');
+    /**
+     * Execute all events functions
+     */
+    const fillEventListeners = () => Object.entries(events)
+        .map(entry => entry[1])
+        .forEach(fn => fn());
 
-        const addPageRegEx = document.getElementById('addPageRegEx');
-        addPageRegEx.addEventListener('click', () => {
-            if (pageRegEx.value.length) {
-                operationRegExes.push(pageRegEx.value);
-            }
-        });
-
-        const removePageRegEx = document.getElementById('removePageRegEx');
-        removePageRegEx.addEventListener('click', () => {
-            operationRegExes.length = 0; // clear list
-            operationRegExes.push(...[...regExes.options].filter(option => !option.selected).map(option => option.innerText));
-        });
-
-        const changePageRegEx = document.getElementById('changePageRegEx');
-        changePageRegEx.addEventListener('click', () => {
-            pageRegEx.value = operationRegExes[regExes.options.selectedIndex]; // get first selected
-            operationRegExes.splice(regExes.options.selectedIndex, 1);
-        });
-
-        [addPageRegEx, removePageRegEx, changePageRegEx].forEach(element =>
-            element.addEventListener('click', () => ui_generator.fillSelect(
-                regExes,
-                operationRegExes.map(regEx => {
-                    return {'innerText': regEx}
-                }))
-            ))
-    }
-
-    function fillActionsSelect() {
-        const selectedAction = document.getElementById('selectedAction');
-        ui_generator.fillSelect(selectedAction, hardcodedActionsInfo.map(action => {
-            return {'innerText': action.name}
-        }));
+    /**
+     * @param {Array<string>} keys
+     */
+    const setLaunchKeys = keys => {
+        if (!keys) return;
+        operationLaunchKeys.length = 0;
+        if (keys.length > 3) {
+            keys.length = 3;
+        }
+        operationLaunchKeys.push(...keys);
     }
 
     /**
-     * @param {Action[]} actions
+     * @param {Array<string>} regExes
      */
-    function addActionsElements(actions) {
-        const actionsElement = elements.operationActions();
-        actions.forEach(action => {
-            const actionInfo = hardcodedActionsInfo.filter(info => info.type === action.type).pop();
-            ui_generator.action(actionInfo).then(element => {
-                addActionEvents(element);
-                Object.keys(action).filter(key => key !== 'type').forEach(key => {
-                    element.querySelector(`#${key}`).value = action[key];
-                })
-                actionsElement.appendChild(element);
-            });
-        })
+    const setRegExes = regExes => {
+        if (!regExes) return;
+        operationRegExes.length = 0;
+        operationRegExes.push(...regExes);
     }
 
-    function addActionEvents(element) {
-        const actionsElement = elements.operationActions();
+    const fillActionsSelect = () => ui_generator.fillSelect(
+        elements.actionSelect, operationActions.map(action => action.name).map(innerTextObject));
+
+    const fillRegExSelect = () => ui_generator.fillSelect(
+        elements.regExesSelect, operationRegExes.map(innerTextObject));
+
+    const innerTextObject = text => {
+        return {'innerText': text};
+    }
+
+    /**
+     * Set actions elements
+     * @param {Action[]} actions
+     */
+    const setActions = actions => actions.forEach(action => {
+        const operationAction = operationActions.filter(info => info.type === action.type).pop();
+        elements.actionsElements.innerHTML = '';
+        ui_generator.action(operationAction).then(element => {
+            fillActionCardEvents(element);
+            Object.keys(action) // fill inputs using all Action fields without type
+                .filter(key => key !== 'type')
+                .forEach(key => element.querySelector(`#${key}`).value = action[key])
+            elements.actionsElements.appendChild(element);
+        });
+    });
+
+    const changeLaunchTypeEvent = () => elements.launchKeysInput.disabled = elements.launchTypeSelect.value !== 'key';
+
+    const editLaunchKeysEvent = event => {
+        if (event.key === 'Backspace') {
+            operationLaunchKeys.pop();
+        } else if (operationLaunchKeys.length < 3) {
+            operationLaunchKeys.push(event.key);
+        }
+        elements.launchKeysInput.value = operationLaunchKeys.length ?
+            operationLaunchKeys.reduce((prev, next) => `${prev} + ${next}`) : '';
+    };
+
+    const addRegExEvent = () => {
+        if (elements.regExInput.value.length) {
+            operationRegExes.push(elements.regExInput.value);
+            fillRegExSelect();
+        }
+    };
+
+    const changeRegExEvent = () => {
+        const selectedIndex = elements.regExesSelect.options.selectedIndex;
+        elements.regExInput.value = operationRegExes[selectedIndex]; // get first selected
+        operationRegExes.splice(selectedIndex, 1);
+        fillRegExSelect();
+    };
+
+    const removeRegExEvent = () => {
+        operationRegExes.length = 0; // clear list
+        operationRegExes.push(...[...elements.regExesSelect.options].filter(option => !option.selected).map(option => option.innerText));
+        fillRegExSelect();
+    };
+
+    const addActionEvent = async () => {
+        const actionInfo = operationActions[elements.actionSelect.options.selectedIndex];
+        const element = await ui_generator.action(actionInfo);
+        fillActionCardEvents(element);
+        elements.actionsElements.appendChild(element);
+    };
+
+    const fillActionCardEvents = (element) => {
+        const operationActions = elements.actionsElements;
         const removeAction = element.querySelector('#removeAction');
         removeAction.addEventListener('click',
             () => element.parentNode.removeChild(element));
@@ -129,41 +188,27 @@ const newOperationUi = (() => {
 
         const moveActionUp = element.querySelector('#moveActionUp');
         moveActionUp.addEventListener('click', () => {
-            const prevIndex = Array.from(actionsElement.children).indexOf(element) - 1;
-            const previousElement = actionsElement.children[prevIndex];
+            const prevIndex = Array.from(operationActions.children).indexOf(element) - 1;
+            const previousElement = operationActions.children[prevIndex];
             if (!previousElement) return;
-            actionsElement.insertBefore(element, previousElement);
+            operationActions.insertBefore(element, previousElement);
         });
 
         const moveActionDown = element.querySelector('#moveActionDown');
         moveActionDown.addEventListener('click', () => {
-            const nextIndex = Array.from(actionsElement.children).indexOf(element) + 1;
-            const nextElement = actionsElement.children[nextIndex];
+            const nextIndex = Array.from(operationActions.children).indexOf(element) + 1;
+            const nextElement = operationActions.children[nextIndex];
             if (!nextElement) return;
-            actionsElement.insertBefore(nextElement, element);
+            operationActions.insertBefore(nextElement, element);
         });
     }
 
-    function addActionButtonEvent() {
-        const addAction = document.getElementById('addAction');
-        const selectedAction = document.getElementById('selectedAction');
-        const actionsEl = elements.operationActions();
-
-        addAction.addEventListener('click', async () => {
-            const actionInfo = hardcodedActionsInfo[selectedAction.options.selectedIndex];
-            const element = await ui_generator.action(actionInfo);
-            addActionEvents(element);
-            actionsEl.appendChild(element);
-        });
-    }
-
-    function createOperationEvent() {
-        const launchType = elements.launchType();
+    const createOperationEvent = () => {
+        const launchType = elements.launchTypeSelect;
         const title = document.getElementById('operationTitle').value;
         const launch = 'key' === launchType.value ?
             new LaunchKeys(operationLaunchKeys) : new Launch(launchType.value);
-        const htmlActions = elements.operationActions();
-        const actions = Array.from(htmlActions.children)
+        const actions = Array.from(elements.actionsElements.children)
             .map(htmlAction => mapper.elementToAction[htmlAction.getAttribute('data-action')](htmlAction));
         const priority = document.getElementById('operationPriority').value;
 
@@ -178,15 +223,16 @@ const newOperationUi = (() => {
         return true;
     }
 
-    function addCreateOperationEvent() {
-        const operationCreate = document.getElementById('operationCreate');
-        operationCreate.addEventListener('click', createOperationEvent);
-    }
-
     return {
         init,
+        fillEventListeners,
+        fillActionsSelect,
+        setLaunchKeys,
+        setRegExes,
         createOperationEvent,
-        operationRegExes,
-        addActionsElements
+        elements,
+        events,
+        setActions,
+        fillRegExSelect
     }
 })();

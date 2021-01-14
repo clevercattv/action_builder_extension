@@ -1,47 +1,33 @@
 const editOperationUi = (() => {
-    const init = (container, operation) => {
-        document.body.appendChild(container);
-        newOperationUi.init();
 
-        const operationCreate = document.getElementById('operationCreate');
-        operationCreate.onclick = () => {
-            if (newOperationUi.createOperationEvent()) {
-                setTimeout(() => {
-                    storage.removeOperation(operation).then(console.log);
-                    window.location = `${location.protocol}//${location.hostname}/html/operations.html`;
-                }, 100);
+    const setUpdateOperationEvent = (operation, {elements, events, createOperationEvent}) => events.createOperationButton = () =>
+        elements.createOperationButton.addEventListener('click', () => {
+            if (createOperationEvent()) {
+                setTimeout(() => storage.removeOperation(operation)
+                    .then(_ => {
+                        window.location = `${location.protocol}//${location.hostname}/html/operations.html`;
+                    }), 100);
             }
-        }
+        })
 
-        fillOperationData(operation);
-    }
+    const fillValue = (element, value) => element.value = value;
 
-    function fillOperationData({title, launch, regExes, actions, priority}) {
-        const operationTitle = document.getElementById('operationTitle');
-        operationTitle.value = title;
+    const fillTitle = ({title}, {elements}) => fillValue(elements.operationTitleInput, title);
 
-        const operationPriority = document.getElementById('operationPriority');
-        operationPriority.value = priority;
+    const fillPriority = ({priority}, {elements}) => fillValue(elements.operationPriorityInput, priority);
 
-        const launchType = document.getElementById('launchType');
-        launchType.value = launch.type;
-        if (launch.type === 'key') {
-            const launchKeys = document.getElementById('launchKeys');
-            launchKeys.value = launch.keys;
-            launchKeys.disabled = false;
-        }
+    const fillLaunch = ({launch}, {elements}) => {
+        fillValue(elements.launchTypeSelect, launch.type);
+        fillValue(elements.launchKeysInput, launch.keys ?
+            launch.keys.reduce((oldKey, key) => `${oldKey} + ${key}`) : '');
 
-        newOperationUi.operationRegExes.push(...regExes);
-        ui_generator.fillSelect(
-            document.getElementById('regExes'),
-            newOperationUi.operationRegExes.map(regEx => {
-                return {'innerText': regEx}
-            }));
-
-        newOperationUi.addActionsElements(actions);
+        elements.launchKeysInput.disabled = elements.launchTypeSelect.value !== 'key';
     }
 
     return {
-        init
+        setUpdateOperationEvent,
+        fillTitle,
+        fillPriority,
+        fillLaunch,
     }
 })();

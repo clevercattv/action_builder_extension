@@ -19,6 +19,7 @@
     <script type="text/javascript" src="../js/content/storage.js"></script>
     <script type="text/javascript" src="../js/mapper.js"></script>
     <script type="text/javascript" src="../js/ui_generator.js"></script>
+    <script type="text/javascript" src="../js/operation_actions.js"></script>
     <script type="text/javascript" src="../js/file_service.js"></script>
     <script type="text/javascript" src="../js/new_operation/ui.js"></script>
     <script type="text/javascript" src="../js/new_operation/index.js"></script>
@@ -97,9 +98,9 @@
                 </div>
                 <div class="row horizontal-divider mt-3">
                     <div class="col-12">
-                        <label for="selectedAction">Action</label>
+                        <label for="action">Action</label>
                         <div class="input-group mb-2">
-                            <select class="form-control" id="selectedAction"></select>
+                            <select class="form-control" id="action"></select>
                             <div class="input-group-append">
                                 <button class="btn btn-primary" id="addAction">
                                     Add
@@ -108,11 +109,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="row" id="operationActions">
+                <div class="row" id="actions">
 
                 </div>
                 <div class="row">
-                    <button type="submit" class="btn btn-primary mb-2 ml-auto mt-1" id="operationCreate">Create
+                    <button type="submit" class="btn btn-primary mb-2 ml-auto mt-1" id="createOperation">Create
                         operation
                     </button>
                 </div>
