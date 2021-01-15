@@ -31,12 +31,15 @@ const actionFunctions = (() => {
     return {
         click: {
             name: "Click on element",
-            init: ({id}) => document.querySelector(id).click()
+            init: ({selector}) => {
+                console.log('click', selector, document.querySelector(selector))
+                document.querySelector(selector).click()
+            }
         },
         downloadImage: {
             name: "Download image",
-            init: async ({id, download}) => {
-                let imageElement = document.querySelector(id);
+            init: async ({selector, download}) => {
+                let imageElement = document.querySelector(selector);
 
                 const downloader = document.createElement("a");
                 downloader.download = templateMapper.templateToText(
@@ -50,7 +53,7 @@ const actionFunctions = (() => {
         },
         timeout: {
             name: "Wait (ms)",
-            init: (_) => new Promise(res => setTimeout(res, ms)),
+            init: ({ms}) => new Promise(res => setTimeout(res, ms)),
         },
         reload: {
             name: "Reload",
