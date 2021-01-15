@@ -2,6 +2,13 @@ const ui_generator = (() => {
     const containerPath = 'html/action/action_container.html';
     const operationCardPath = 'html/operation_card.html';
 
+    /**
+     *
+     * @param {string} name
+     * @param {string} type
+     * @param {string} file
+     * @return {Promise<Element>}
+     */
     async function action({name, type, file}) {
         const container = await fetchActionBody(containerPath);
         container.setAttribute('data-action', type);

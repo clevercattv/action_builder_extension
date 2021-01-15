@@ -1,5 +1,6 @@
-window.addEventListener('load', () => {
-    operationLauncher.pushOperations(storage.getCurrentSiteOperation());
+window.addEventListener('load', async () => {
+    const currentSiteOperations = await storage.getCurrentSiteOperation();
+    operationLauncher.pushOperations(currentSiteOperations);
     operationLauncher.launchOperations();
 })
 
@@ -7,7 +8,7 @@ const operationLauncher = (() => {
     const pressedKeys = {};
     const operationQueue = [];
 
-    const pushOperations = operations => operationQueue.push(operations);
+    const pushOperations = operations => operationQueue.push(...operations);
 
     const launchOperations = () => {
         operationQueue.sort((a, b) => a.priority - b.priority);
@@ -17,21 +18,21 @@ const operationLauncher = (() => {
         }
     }
 
-    const hasNext = () => !operationQueue.length;
+    const hasNext = () => operationQueue.length;
     const isEveryKeyPressed = operation => operation.launch.keys.every(ac => pressedKeys[ac]);
     const isActiveTextElement = () => ["input", "textarea"].some(type => type === document.activeElement.localName);
 
-    const launchActions = (operation, iteration = 0) => {
+    const launchOperationActions = (operation, iteration = 0) => {
         if (!operation.actions[iteration]) return;
 
         const action = operation.actions[iteration];
         actionFunctions[action.type].init(action);
 
-        launchActions(operation, iteration);
+        launchOperationActions(operation, ++iteration);
     }
 
     const launches = {
-        keydown: (operation) => {
+        key: (operation) => {
             window.addEventListener("keyup", (_event) => {
                 if (_event.key) pressedKeys[_event.key.toLowerCase()] = false;
             })
@@ -39,12 +40,14 @@ const operationLauncher = (() => {
                 if (_event.key) pressedKeys[_event.key.toLowerCase()] = true;
 
                 if (isEveryKeyPressed(operation) && !isActiveTextElement()) {
-                    launchActions(operation);
+                    launchOperationActions(operation);
+                    console.log('key', operation)
                 }
             })
         },
-        onLoaded: (operation) => {
-            launchActions(operation);
+        load: (operation) => {
+            launchOperationActions(operation);
+            console.log('load', operation);
         }
     };
 
