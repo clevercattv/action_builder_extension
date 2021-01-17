@@ -98,8 +98,9 @@ function OperationView(launchKeys = [], regExes = []) {
         fillRegExSelect();
     };
 
+    const createActionCard = async actionInfo => await ui_generator.action(actionInfo);
+
     const addActionCard = async (parent, actionInfo, card) => {
-        if (!card) card = await ui_generator.action(actionInfo);
         addActionCardEvents(card);
         if (actionInfo.fillEvents) actionInfo.fillEvents(card);
         parent.appendChild(card);
@@ -148,7 +149,8 @@ function OperationView(launchKeys = [], regExes = []) {
             launch,
             regExes,
             actions,
-            priority > 0 ? priority : 1
+            priority > 0 ? priority : 1,
+            !actions.some(action => '' === action.selector)
         );
     }
 
@@ -166,8 +168,10 @@ function OperationView(launchKeys = [], regExes = []) {
     elements.addRegExButton.addEventListener('click', addRegExEvent);
     elements.changeRegExButton.addEventListener('click', changeRegExEvent);
     elements.removeRegExButton.addEventListener('click', removeRegExEvent);
-    elements.addActionButton.addEventListener('click', () =>
-        addActionCard(elements.actionsElement, operationActions[elements.actionSelect.options.selectedIndex]));
+    elements.addActionButton.addEventListener('click', async () => {
+        const actionInfo = operationActions[elements.actionSelect.options.selectedIndex];
+        return addActionCard(elements.actionsElement, actionInfo, await createActionCard(actionInfo));
+    });
 
     return {
         createOperation,

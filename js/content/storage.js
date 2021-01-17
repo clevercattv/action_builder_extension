@@ -44,6 +44,20 @@ const storage = (() => {
     }
 
     /**
+     * @param {boolean} isEnabled
+     * @param {string} id
+     * @return {Promise<<Operation>[]>}
+     */
+    const updateOperationIsEnabled = async (isEnabled, id) => {
+        let operations = await getOperations();
+        const updatingOperation = operations.find(operation => operation.id === id);
+        updatingOperation.isEnabled = isEnabled;
+        chrome.storage.local.set({operations});
+        console.log(operations);
+        return operations;
+    }
+
+    /**
      * @param {Operation} operation
      * @return {Promise<<Operation>[]>} result operations
      */
@@ -68,5 +82,6 @@ const storage = (() => {
         addOperation,
         removeOperation,
         removeOperationById,
+        updateOperationIsEnabled,
     }
 })()

@@ -28,7 +28,7 @@ window.addEventListener('load', async () => {
         const operationAction = operationActions.filter(info => info.type === action.type).pop();
         const card = await ui_generator.action(operationAction);
 
-        addActionCard(elements.actionsElement, operationAction, card);
+        await addActionCard(elements.actionsElement, operationAction, card);
         operationAction.fillInputs(card, action);
     }
 })

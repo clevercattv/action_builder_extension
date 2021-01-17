@@ -1,19 +1,20 @@
 class Operation {
     /**
-     * todo add disable option
      * @param {string} title
      * @param {Launch} launch
      * @param {string[]} regExes
      * @param {Action[]} actions
      * @param {int} priority
+     * @param {boolean} isEnabled
      */
-    constructor(title, launch, regExes, actions, priority) {
+    constructor(title, launch, regExes, actions, priority, isEnabled) {
         this.id = generateID();
         this.title = title;
         this.launch = launch;
         this.regExes = regExes;
         this.actions = actions;
         this.priority = priority;
+        this.isEnabled = isEnabled;
     }
 
 }

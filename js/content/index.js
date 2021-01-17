@@ -11,7 +11,8 @@ const operationLauncher = (() => {
     const pushOperations = operations => operationQueue.push(...operations);
 
     const launchOperations = () => {
-        operationQueue.sort((a, b) => a.priority - b.priority);
+        operationQueue.filter(operation => operation.isEnabled)
+            .sort((a, b) => a.priority - b.priority);
         while (hasNext()) {
             let operation = operationQueue.pop();
             launches[operation.launch.type](operation);
