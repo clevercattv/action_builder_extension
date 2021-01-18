@@ -10,13 +10,13 @@ const ui_generator = (() => {
      * @return {Promise<Element>}
      */
     async function action({name, type, file}) {
-        const container = await fetchActionBody(containerPath);
+        const container = await fetchFirstBodyElement(containerPath);
         container.setAttribute('data-action', type);
 
         const actionName = container.querySelector('#actionName');
         actionName.innerHTML = name + actionName.innerHTML;
 
-        const body = await fetchActionBody(file);
+        const body = await fetchFirstBodyElement(file);
         container.querySelector('div[class*=card-body]').append(body);
 
         return container;
@@ -32,7 +32,7 @@ const ui_generator = (() => {
     }
 
     async function operationCard({title, launch, regExes, actions, priority}) {
-        const card = await fetchActionBody(operationCardPath);
+        const card = await fetchFirstBodyElement(operationCardPath);
 
         const cardHeader = card.querySelector('[class*=card-header]');
         cardHeader.innerText = `${title} [priority: ${priority}]`;

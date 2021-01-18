@@ -55,6 +55,7 @@ const operationLauncher = (() => {
     return {
         pushOperations,
         launchOperations,
+        launchOperationActions
     };
 
 })();

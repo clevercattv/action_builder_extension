@@ -178,7 +178,6 @@ function OperationView(launchKeys = [], regExes = []) {
         addActionCard,
         operationActions,
         elements,
-
     }
 }
 

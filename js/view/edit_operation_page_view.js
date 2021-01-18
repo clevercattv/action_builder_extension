@@ -1,5 +1,5 @@
 window.addEventListener('load', async () => {
-    document.body.appendChild(await fetchActionBody('html/new_operation.html'));
+    document.body.appendChild(await fetchFirstBodyElement('html/new_operation.html'));
 
     const urlParams = new URLSearchParams(window.location.search);
     const operationId = urlParams.get('operation');
