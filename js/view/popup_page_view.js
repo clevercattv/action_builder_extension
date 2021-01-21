@@ -1,8 +1,3 @@
-/*
-checked-action #70AC85; No errors, all needed fields filled.
-warning-action #FFDF8E; Not all needed fields filled.
-error-action   #FD8B7B; Get's some errors while try to action.
- */
 window.addEventListener('load', async () => {
     // enable bootstrap tooltips
     $(function () {
@@ -14,11 +9,13 @@ window.addEventListener('load', async () => {
         });
     });
 
-    const displayNone = 'd-none';
     const container = document.querySelector('[class*=container]');
     const operations = await storage.getOperations();
+    const currentLocation = await new Promise(resolve => chrome.tabs.query(
+        {active: true}, tab => resolve(tab[0].url)
+    ));
     const groupedOperations = operations.reduce((previousValue, currentValue) => {
-        if (currentValue.regExes.some(regEx => window.location.href.match(regEx))) {
+        if (currentValue.regExes.some(regEx => currentLocation.match(regEx))) {
             previousValue.currentPageOperations.push(currentValue);
         } else {
             previousValue.otherPagesOperations.push(currentValue);
@@ -88,108 +85,20 @@ window.addEventListener('load', async () => {
     for (const operation of groupedOperations.otherPagesOperations) {
         otherOperationsElement.appendChild(await buildOperation(operation));
     }
-    container.querySelector('#currentOperationsTitle').innerText = `Current site actions [${groupedOperations.currentPageOperations.length}]`;
-    container.querySelector('#otherOperationsTitle').innerText = `Other site actions [${groupedOperations.otherPagesOperations.length}]`;
 
-    const getCardElements = cardElement => {
-        return {
-            cardElement,
-            bodyElement: cardElement.querySelector('[class*=card-body]'),
-            launchSpan: cardElement.querySelector('#launch'),
-            titleElement: cardElement.querySelector('#title'),
-            hideActionButton: cardElement.querySelector('#hideAction'),
-            editButton: cardElement.querySelector('#edit'),
-            removeButton: cardElement.querySelector('#remove'),
-            launchOperationButton: cardElement.querySelector('#launchOperation'),
-            isEnabledInput: cardElement.querySelector('#isEnabled'),
-            actionsElement: cardElement.querySelector('#actions'),
-        }
-    }
+    const displayElement = 'active';
+    const hideExposeElement = bodyElement => () => bodyElement.classList.contains(displayElement) ?
+        bodyElement.classList.remove(displayElement) : bodyElement.classList.add(displayElement);
 
-    const hideExposeElement = bodyElement => () => bodyElement.classList.contains(displayNone) ?
-        bodyElement.classList.remove(displayNone) : bodyElement.classList.add(displayNone);
+    container.querySelector('#currentOperationsTitle').parentElement
+        .addEventListener('click', hideExposeElement(currentOperationsElement));
 
-    const createOperationEditTab = operation => () => chrome.tabs.create({
-        url: `${location.protocol}//${location.hostname}/html/edit_operation.html?operation=${operation.id}`
-    });
+    container.querySelector('#otherOperationsTitle').parentElement
+        .addEventListener('click', hideExposeElement(otherOperationsElement));
 
-    const removeOperation = (operation, card) =>
-        storage.removeOperation(operation).then(() => card.remove());
-
-    const invertIsEnabled = (operation, cardElements) => () =>
-        storage.updateOperationIsEnabled(operation.isEnabled = cardElements.isEnabledInput.checked, operation.id);
-
-    const buildActionElement = async action => {
-        const actionElement = document.createElement('div');
-        actionElement.classList.add('d-flex');
-
-        const actionNameElement = document.createElement('a');
-        actionNameElement.innerText = action.typeName;
-
-        if (action.selector === '') {
-            actionElement.style.color = 'red';
-            actionNameElement.innerText += ' [need add selector]';
-        } else {
-            actionElement.style.color = 'green';
-        }
-
-        const editIconElement = await fetchFirstBodyElement('icon/edit-solid.svg');
-
-        actionElement.appendChild(actionNameElement);
-        actionElement.appendChild(editIconElement);
-        return actionElement;
-    }
-
-    const buildOperationCard = async operation => {
-        const cardElements = getCardElements(await fetchFirstBodyElement('html/popup_card.html'));
-
-        if (operations.length < 3) {
-            cardElements.bodyElement.classList.remove(displayNone)
-        }
-
-        cardElements.launchSpan.innerText = 'Launch type: ' + operation.launch.type
-            + (operation.launch.keys ? ` [${operation.launch.keys.reduce((prev, cur) => `${prev} + ${cur}`)}]` : '');
-        cardElements.titleElement.innerText = operation.title;
-
-        cardElements.hideActionButton.addEventListener('click', hideExposeElement(cardElements.bodyElement));
-        cardElements.editButton.addEventListener('click', createOperationEditTab(operation));
-        cardElements.removeButton.addEventListener('click', () => removeOperation(operation, cardElements.cardElement));
-
-        cardElements.isEnabledInput.checked = operation.isEnabled;
-        cardElements.isEnabledInput.addEventListener('click', invertIsEnabled(operation, cardElements))
-
-        for (const action of operation.actions) {
-            const actionElement = await buildActionElement(action);
-            cardElements.actionsElement.appendChild(actionElement);
-        }
-
-        container.appendChild(cardElements.cardElement);
-        return cardElements.cardElement;
-    };
-
-    const buildH3CenteredElement = (text) => {
-        const headingElement = document.createElement('h3');
-        headingElement.style.textAlign = 'center';
-        headingElement.innerText = text;
-        return headingElement;
-    };
-    //
-    // if (groupedOperations.currentPageOperations.length) {
-    //     container.appendChild(buildH3CenteredElement('Current page actions'));
-    //
-    //     for (const operation of groupedOperations.currentPageOperations) {
-    //         await buildOperationCard(operation);
-    //     }
-    // }
-    //
-    // if (groupedOperations.otherPagesOperations.length) {
-    //     container.appendChild(buildH3CenteredElement('Other pages actions'));
-    //
-    //     for (const operation of groupedOperations.otherPagesOperations) {
-    //         const cardElement = await buildOperationCard(operation);
-    //         const launchOperationButton = cardElement.querySelector('#launchOperation');
-    //         launchOperationButton.parentElement.removeChild(launchOperationButton);
-    //     }
-    // }
+    container.querySelector('#currentOperationsTitle').innerText =
+        `Current site actions [${groupedOperations.currentPageOperations.length}]`;
+    container.querySelector('#otherOperationsTitle').innerText =
+        `Other site actions [${groupedOperations.otherPagesOperations.length}]`;
 
 })

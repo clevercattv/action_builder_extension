@@ -52,8 +52,43 @@
             color: #555555;
         }
 
+        @keyframes fade_in_show {
+            0% {
+                opacity: 0;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(1);
+            }
+        }
+
+        @keyframes fade_out_show {
+            0% {
+                display: block;
+                opacity: 1;
+                transform: translateY(1);
+            }
+            99% {
+                display: block;
+                opacity: 0;
+                transform: translateY(0);
+            }
+            100% {
+                display: none;
+                opacity: 0;
+                transform: translateY(0);
+            }
+        }
+
         .popup-operations {
             background-color: #F4F4F4;
+            animation: fade_out_show 250ms ease-in-out both;
+        }
+
+        .popup-operations.active {
+            animation: fade_in_show 250ms ease-in-out both;
         }
 
         .element-header {
@@ -109,7 +144,7 @@
     <div class="row popup-header">
         <div class="col-1 align-self-center text-center" id="bar">
             <!-- Extension icon -->
-            <img class="rounded-circle size-48" src="../icon/default-image.png" alt="Avatar">
+            <img class="rounded-circle size-48 no-select" src="../icon/default-image.png" alt="Avatar">
         </div>
         <div class="col-10 align-self-center d-flex">
             <span class="m-0 h4 d-inline-block popup-title no-select">Action builder</span>
@@ -125,13 +160,13 @@
     </div>
     <div class="row">
         <div class="col-12 pb-1">
-            <div class="row">
-                <div class="operations-header d-flex align-items-center justify-content-center pl-3 w-100">
+            <div class="row operations-header">
+                <div class="d-flex align-items-center justify-content-center pl-3 w-100">
                     <a class="element-title text-white no-select text-decoration-none" id="currentOperationsTitle">Current site actions</a>
                 </div>
             </div>
         </div>
-        <div class="col-12 popup-operations" id="currentOperations"></div>
+        <div class="col-12 popup-operations active" id="currentOperations"></div>
         <div class="col-12 pb-1">
             <div class="row">
                 <div class="operations-header d-flex align-items-center justify-content-center pl-3 w-100">
@@ -139,7 +174,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 popup-operations" id="otherOperations"></div>
+        <div class="col-12 popup-operations active" id="otherOperations"></div>
     </div>
 </div>
 </body>
