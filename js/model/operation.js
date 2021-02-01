@@ -1,5 +1,8 @@
 class Operation {
     /**
+     * todo ADD link on site icon (get if no icon, before operations)
+     *  and default icon (if operations uses for multiple sites or operation never launch)
+     *  Also add refresh icon button somewhere... maybe...
      * @param {string} title
      * @param {Launch} launch
      * @param {string[]} regExes
@@ -15,6 +18,7 @@ class Operation {
         this.actions = actions;
         this.priority = priority;
         this.isEnabled = isEnabled;
+        this.icon = '';
     }
 
 }

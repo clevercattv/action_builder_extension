@@ -9,52 +9,72 @@ window.addEventListener('load', async () => {
         });
     });
 
+    const activeKey = 'active';
+
     const container = document.querySelector('[class*=container]');
-    const operations = await storage.getOperations();
-    const currentLocation = await new Promise(resolve => chrome.tabs.query(
-        {active: true}, tab => resolve(tab[0].url)
-    ));
-    const groupedOperations = operations.reduce((previousValue, currentValue) => {
-        if (currentValue.regExes.some(regEx => currentLocation.match(regEx))) {
-            previousValue.currentPageOperations.push(currentValue);
-        } else {
-            previousValue.otherPagesOperations.push(currentValue);
-        }
+    const elements = {
+        currentOperationTitle: container.querySelector('#currentOperationsTitle'),
+        otherOperationsTitle: container.querySelector('#otherOperationsTitle'),
+        currentOperations: container.querySelector('#currentOperations'),
+        otherOperations: container.querySelector('#otherOperations'),
+        options: container.querySelector('#options'),
+    }
+
+    const currentLocation = await new Promise(resolve =>
+        chrome.tabs.query({active: true}, tab => resolve(tab[0].url)));
+
+    const groupedOperations = (await storage.getOperations()).reduce((previousValue, currentValue) => {
+        previousValue[currentValue.regExes.some(regEx => currentLocation.match(regEx)) ?
+            'currentPageOperations' : 'otherPagesOperations'].push(currentValue);
+        previousValue.allOperations.push(currentValue);
         return previousValue;
     }, {
         currentPageOperations: [],
         otherPagesOperations: [],
+        allOperations: []
     });
 
-    const buildOperation = async operation => {
-        const operationElement = await fetchFirstBodyElement('html/popup/popup_operation.html');
-        operationElement.querySelector('#title').innerText = operation.title;
+    const getOperationElements = operationElement => {
+        return {
+            title: operationElement.querySelector('#title'),
+            launch: operationElement.querySelector('#launch'),
+            actionTitle: operationElement.querySelector('#actionTitle'),
+            edit: operationElement.querySelector('#edit'),
+            remove: operationElement.querySelector('#remove'),
+            isEnabled: operationElement.querySelector('#isEnabled'),
+            actions: operationElement.querySelector('#actions'),
+        }
+    }
 
-        operationElement.querySelector('#launch').innerText = 'Launch type: ' + operation.launch.type
+    const buildOperation = async ({operation, operationCallback, actionCallback}) => {
+        const operationContainer = await fetchFirstBodyElement('html/popup/popup_operation.html');
+        const operationElements = getOperationElements(operationContainer);
+        operationElements.title.innerText = operation.title;
+
+        operationElements.launch.innerText = 'Launch type: ' + operation.launch.type
             + (operation.launch.keys ? ` [${operation.launch.keys.reduce((prev, cur) => `${prev} + ${cur}`)}]` : '');
 
-        operationElement.querySelector('#actionTitle').innerText = `Actions [${operation.actions.length}]`;
+        operationElements.actionTitle.innerText = `Actions [${operation.actions.length}]`;
 
-        operationElement.querySelector('#edit')
-            .addEventListener('click', () => chrome.tabs.create({
-                url: `${location.protocol}//${location.hostname}/html/edit_operation.html?operation=${operation.id}`
-            }));
+        operationElements.edit.addEventListener('click', () => chrome.tabs.create({
+            url: `${location.protocol}//${location.hostname}/html/edit_operation.html?operation=${operation.id}`
+        }));
 
-        operationElement.querySelector('#remove')
-            .addEventListener('click', () =>
-                storage.removeOperation(operation).then(() => operationElement.remove()));
+        operationElements.remove.addEventListener('click', () =>
+            storage.removeOperation(operation).then(() => operationContainer.remove()));
 
-        const isEnabledInput = operationElement.querySelector('#isEnabled');
-        isEnabledInput.checked = operation.isEnabled;
-        isEnabledInput.addEventListener('click', () =>
-            storage.updateOperationIsEnabled(operation.isEnabled = isEnabledInput.checked, operation.id));
+        operationElements.isEnabled.checked = operation.isEnabled;
+        operationElements.isEnabled.addEventListener('click', () =>
+            storage.updateOperationIsEnabled(operation.isEnabled = operationElements.isEnabled.checked, operation.id));
 
-        const actionsContainer = operationElement.querySelector('#actions');
         for (const [index, action] of operation.actions.entries()) {
-            actionsContainer.appendChild(await buildAction(action, index));
+            const actionElement = await buildAction(action, index);
+            operationElements.actions.appendChild(actionElement);
+            actionCallback(actionElement, action);
         }
 
-        return operationElement;
+        operationCallback(operationContainer);
+        return operationContainer;
     }
 
     const buildAction = async (action, index) => {
@@ -68,37 +88,66 @@ window.addEventListener('load', async () => {
         } else {
             nameElement.parentElement.classList.add('warning-action');
         }
-        // todo add edit selector icon button
-
         return actionElement;
     }
 
-    container.querySelector('#options').addEventListener('click', () => chrome.tabs.create({
+    const toggleClass = bodyElement =>
+        requestAnimationFrame(() => bodyElement.classList.contains(activeKey) ?
+            bodyElement.classList.remove(activeKey) : bodyElement.classList.add(activeKey));
+
+    elements.options.addEventListener('click', () => chrome.tabs.create({
         url: `${location.protocol}//${location.hostname}/html/options.html`
     }));
 
-    const currentOperationsElement = container.querySelector('#currentOperations');
-    const otherOperationsElement = container.querySelector('#otherOperations');
     for (const operation of groupedOperations.currentPageOperations) {
-        currentOperationsElement.appendChild(await buildOperation(operation));
+        elements.currentOperations.appendChild(await buildOperation({
+            operation,
+            operationCallback: operationElement => {
+                operationElement.querySelector('#launchOperation')
+                    .addEventListener('click', () => chrome.tabs.query({active: true},
+                        tabs => chrome.tabs.executeScript(
+                            tabs[0].id,
+                            {code: `operationLauncher.launchOperationActions(${JSON.stringify(operation)})`},
+                            () => window.close()
+                        )
+                    ));
+            },
+            actionCallback: (actionElement, action) => {
+                actionElement.querySelector('#editSelector')
+                    .addEventListener('click', () => {
+                        chrome.tabs.query({active: true}, tabs => {
+                            chrome.tabs.executeScript(tabs[0].id, {
+                                code: `
+                        var action = JSON.parse('${JSON.stringify(action)}');
+                        var operationId = '${operation.id}';
+                        `
+                            }, () => chrome.tabs.executeScript(tabs[0].id, {
+                                file: 'js/inject_script/change_action_selector.js'
+                            }))
+                        })
+                    });
+            }
+        }));
     }
+
     for (const operation of groupedOperations.otherPagesOperations) {
-        otherOperationsElement.appendChild(await buildOperation(operation));
+        elements.otherOperations.appendChild(await buildOperation({
+            operation,
+            operationCallback: operationElement => {
+                operationElement.querySelector('#launchOperation').remove();
+            },
+            actionCallback: actionElement => {
+                actionElement.querySelector('#editSelector').remove();
+            }
+        }));
     }
 
-    const displayElement = 'active';
-    const hideExposeElement = bodyElement => () => bodyElement.classList.contains(displayElement) ?
-        bodyElement.classList.remove(displayElement) : bodyElement.classList.add(displayElement);
+    elements.currentOperationTitle.parentElement.addEventListener('click',
+        () => toggleClass(elements.currentOperations));
+    elements.otherOperationsTitle.parentElement.addEventListener('click',
+        () => toggleClass(elements.otherOperations));
 
-    container.querySelector('#currentOperationsTitle').parentElement
-        .addEventListener('click', hideExposeElement(currentOperationsElement));
-
-    container.querySelector('#otherOperationsTitle').parentElement
-        .addEventListener('click', hideExposeElement(otherOperationsElement));
-
-    container.querySelector('#currentOperationsTitle').innerText =
-        `Current site actions [${groupedOperations.currentPageOperations.length}]`;
-    container.querySelector('#otherOperationsTitle').innerText =
-        `Other site actions [${groupedOperations.otherPagesOperations.length}]`;
+    elements.currentOperationTitle.innerText = `Current site actions [${groupedOperations.currentPageOperations.length}]`;
+    elements.otherOperationsTitle.innerText = `Other site actions [${groupedOperations.otherPagesOperations.length}]`;
 
 })

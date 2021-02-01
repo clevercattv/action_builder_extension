@@ -1,3 +1,26 @@
+const actionsInfo = {
+    click:{
+        name: 'Click',
+        type: 'click',
+        file: 'html/action/click.html',
+    },
+    downloadImage:{
+        name: 'Download image',
+        type: 'downloadImage',
+        file: 'html/action/download_image.html',
+    },
+    wait:{
+        name: 'Wait',
+        type: 'wait',
+        file: 'html/action/wait.html',
+    },
+    reload:{
+        name: 'Reload',
+        type: 'reload',
+        file: 'html/action/reload.html',
+    },
+};
+
 class Action {
 
     /**
@@ -5,6 +28,7 @@ class Action {
      * @param {string} typeName
      */
     constructor(type, typeName) {
+        this.id = generateID();
         this.type = type;
         this.typeName = typeName;
     }
