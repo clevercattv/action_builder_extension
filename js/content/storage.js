@@ -58,6 +58,21 @@ const storage = (() => {
     }
 
     /**
+     * @param {Action} action
+     * @param {string} operationId
+     * @return {Promise<<Operation>[]>}
+     */
+    const updateOperationAction = async (action, operationId) => {
+        let operations = await getOperations();
+        const updatingOperation = operations.find(operation => operation.id === operationId);
+        updatingOperation.actions.splice(
+            updatingOperation.actions.map(act => act.id).indexOf(id => id === action.id), 1, action);
+        chrome.storage.local.set({operations});
+        console.log(operations);
+        return operations;
+    }
+
+    /**
      * @param {Operation} operation
      * @return {Promise<<Operation>[]>} result operations
      */
@@ -83,5 +98,6 @@ const storage = (() => {
         removeOperation,
         removeOperationById,
         updateOperationIsEnabled,
+        updateOperationAction
     }
 })()

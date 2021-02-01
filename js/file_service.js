@@ -1,4 +1,4 @@
-const fetchActionBody = (() => {
+const fetchFirstBodyElement = (() => {
     const cache = {};
     return async (path) => {
         if (!cache[path]) {
