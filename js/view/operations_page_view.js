@@ -6,8 +6,34 @@ window.addEventListener('load', async () => {
         operations.forEach(operation => createCard(operation));
     }
 
+    async function createOperationCardElement({title, launch, regExes, actions, priority}) {
+        const card = await fetchFirstBodyElement('html/operation_card.html');
+
+        const cardHeader = card.querySelector('[class*=card-header]');
+        cardHeader.innerText = `${title} [priority: ${priority}]`;
+
+        const cardTitle = card.querySelector('[class*=card-title]');
+        cardTitle.innerText = `Launch type: ${launch.type} ${launch.type === 'key' ? '[' + launch.keys + ']' : ''}`;
+
+        const cardRegExes = card.querySelector('#regExes');
+        regExes.forEach(regEx => {
+            let li = document.createElement('li');
+            li.innerText = regEx;
+            cardRegExes.appendChild(li);
+        });
+
+        const cardActions = card.querySelector('#actions');
+        actions.forEach(act => {
+            let li = document.createElement('li');
+            li.innerText = act.type;
+            cardActions.appendChild(li);
+        });
+
+        return card;
+    }
+
     const createCard = async operation => {
-        const card = await ui_generator.operationCard(operation);
+        const card = await createOperationCardElement(operation);
 
         const edit = card.querySelector('#edit');
         edit.addEventListener('click', () => {
