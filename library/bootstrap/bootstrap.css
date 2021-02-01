@@ -10307,6 +10307,18 @@ a.text-dark:hover, a.text-dark:focus {
                                   supported by Chrome, Edge, Opera and Firefox */
 }
 
+.top-fixed-element {
+  position: fixed;
+  top: 100px;
+  right: 100px;
+  z-index: 999999;
+  background: #888888;
+  padding: 0.5rem;
+}
 
+.top-fixed-element:hover {
+  right: 0;
+  left: 100px;
+}
 
 /*# sourceMappingURL=bootstrap.css.map */
