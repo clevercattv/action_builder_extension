@@ -7,7 +7,21 @@ window.addEventListener('load', async () => {
 
     const fillValue = (element, value) => element.value = value;
 
-    const {elements, operationActions, addActionCard, createOperation} = OperationView(launch.keys || [], regExes);
+    const {elements, addActionCard, createOperation} = OperationView(launch.keys || [], regExes);
+    const actionFillFunctions = {
+        click: (container, {selector}) => {
+            container.querySelector('#selector').value = selector;
+        },
+        downloadImage: (container, {extension, name, selector}) => {
+            container.querySelector('#name').value = name;
+            container.querySelector('#extension').value = extension;
+            container.querySelector('#selector').value = selector;
+        },
+        wait: (container, {ms}) => {
+            container.querySelector('#ms').value = ms;
+        },
+        reload: () => {},
+    };
 
     elements.createOperationButton.addEventListener('click', () => {
         const operation = createOperation();
@@ -25,10 +39,8 @@ window.addEventListener('load', async () => {
 
     elements.actionsElement.innerHTML = '';
     for (const action of actions) {
-        const operationAction = operationActions.filter(info => info.type === action.type).pop();
-        const card = await ui_generator.action(operationAction);
-
-        await addActionCard(elements.actionsElement, operationAction, card);
-        operationAction.fillInputs(card, action);
+        const fillFunction = actionFillFunctions[action.type];
+        const card = await addActionCard(actionsInfo[action.type]);
+        fillFunction(card, action);
     }
 })

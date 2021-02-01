@@ -1,46 +1,4 @@
 function OperationView(launchKeys = [], regExes = []) {
-    const operationActions = [
-        {
-            name: 'Click',
-            type: 'click',
-            file: 'html/action/click.html',
-            fillInputs: (container, {selector}) => {
-                container.querySelector('#selector').value = selector;
-            }
-        },
-        {
-            name: 'Download image',
-            type: 'downloadImage',
-            file: 'html/action/download_image.html',
-            fillEvents: element => {
-                const templates = element.querySelector('#templates');
-                const name = element.querySelector('#name');
-                Array.from(templates.children).forEach(button => button.addEventListener('click', () => {
-                    name.value += `\$\{${button.getAttribute('data-name')}\}`
-                }))
-            },
-            fillInputs: (container, {extension, name, selector}) => {
-                container.querySelector('#name').value = name;
-                container.querySelector('#extension').value = extension;
-                container.querySelector('#selector').value = selector;
-            }
-        },
-        {
-            name: 'Wait',
-            type: 'wait',
-            file: 'html/action/wait.html',
-            fillInputs: (container, {ms}) => {
-                container.querySelector('#ms').value = ms;
-            }
-        },
-        {
-            name: 'Reload',
-            type: 'reload',
-            file: 'html/action/reload.html',
-            fillInputs: () => {}
-        },
-    ];
-
     const elements = {
         launchTypeSelect: document.querySelector('#launchType'),
         launchKeysInput: document.querySelector('#launchKeys'),
@@ -57,14 +15,18 @@ function OperationView(launchKeys = [], regExes = []) {
         operationPriorityInput: document.querySelector('#operationPriority'),
     }
 
-    const fillRegExSelect = () => ui_generator.fillSelect(
-        elements.regExesSelect,
-        regExes.map(text => {
-            return {'innerText': text};
-        }));
+    const fillSelect = (select, innerTexts) => {
+        select.innerHTML = '';
+        innerTexts.forEach(text => {
+            const element = document.createElement("option");
+            element.innerText = text;
+            select.appendChild(element);
+        })
+    };
 
-    const changeLaunchType = () =>
-        elements.launchKeysInput.disabled = elements.launchTypeSelect.value !== 'key';
+    const fillRegExSelect = () => fillSelect(elements.regExesSelect, regExes);
+
+    const changeLaunchType = () => elements.launchKeysInput.disabled = elements.launchTypeSelect.value !== 'key';
 
     const fillLaunchKeys = () => elements.launchKeysInput.value = launchKeys.length ?
         launchKeys.reduce((prev, next) => `${prev} + ${next}`) : '';
@@ -98,12 +60,47 @@ function OperationView(launchKeys = [], regExes = []) {
         fillRegExSelect();
     };
 
-    const createActionCard = async actionInfo => await ui_generator.action(actionInfo);
+    const addActionCard = async actionInfo => {
+        const card = await createActionCard(actionInfo);
+        elements.actionsElement.appendChild(card);
+        return card;
+    }
 
-    const addActionCard = async (parent, actionInfo, card) => {
+    const actionEvents = {
+        downloadImage: element => {
+            const templates = element.querySelector('#templates');
+            const name = element.querySelector('#name');
+            Array.from(templates.children).forEach(button => button.addEventListener('click', () => {
+                name.value += `\$\{${button.getAttribute('data-name')}\}`
+            }))
+        }
+    };
+
+    /**
+     *
+     * @param {string} name
+     * @param {string} type
+     * @param {string} file
+     * @return {Promise<Element>}
+     */
+    async function createActionCardElement({name, type, file}) {
+        const actionContainer = await fetchFirstBodyElement('html/action/action_container.html');
+        actionContainer.setAttribute('data-action', type);
+
+        const actionName = actionContainer.querySelector('#actionName');
+        actionName.innerHTML = name + actionName.innerHTML;
+
+        const body = await fetchFirstBodyElement(file);
+        actionContainer.querySelector('div[class*=card-body]').append(body);
+
+        return actionContainer;
+    }
+
+    const createActionCard = async actionInfo => {
+        const card = await createActionCardElement(actionInfo);
+        if (actionEvents[actionInfo.type]) actionEvents[actionInfo.type](card);
         addActionCardEvents(card);
-        if (actionInfo.fillEvents) actionInfo.fillEvents(card);
-        parent.appendChild(card);
+        return card;
     };
 
     const addActionCardEvents = (element) => {
@@ -154,11 +151,9 @@ function OperationView(launchKeys = [], regExes = []) {
         );
     }
 
-    ui_generator.fillSelect(
+    fillSelect(
         elements.actionSelect,
-        operationActions.map(action => action.name).map(text => {
-            return {'innerText': text};
-        }));
+        Object.values(actionsInfo).map(value => value.name));
 
     fillRegExSelect();
     fillLaunchKeys();
@@ -168,15 +163,12 @@ function OperationView(launchKeys = [], regExes = []) {
     elements.addRegExButton.addEventListener('click', addRegExEvent);
     elements.changeRegExButton.addEventListener('click', changeRegExEvent);
     elements.removeRegExButton.addEventListener('click', removeRegExEvent);
-    elements.addActionButton.addEventListener('click', async () => {
-        const actionInfo = operationActions[elements.actionSelect.options.selectedIndex];
-        return addActionCard(elements.actionsElement, actionInfo, await createActionCard(actionInfo));
-    });
+    elements.addActionButton.addEventListener('click', async () =>
+        await addActionCard(Object.values(actionsInfo)[elements.actionSelect.options.selectedIndex]));
 
     return {
-        createOperation,
         addActionCard,
-        operationActions,
+        createOperation,
         elements,
     }
 }
