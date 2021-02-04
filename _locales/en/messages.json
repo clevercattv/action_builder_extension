@@ -4,5 +4,23 @@
   },
   "description": {
     "message": "Chrome extension for adding actions on web pages"
+  },
+  "options": {
+    "message": "Options"
+  },
+  "addNewOperation": {
+    "message": "Add new operation"
+  },
+  "operations": {
+    "message": "Operations"
+  },
+  "launchType": {
+    "message": "Launch type"
+  },
+  "elementSelector": {
+    "message": "Element selector translated!"
+  },
+  "click": {
+    "message": "Click translated!"
   }
 }
