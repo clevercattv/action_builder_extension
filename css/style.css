@@ -1,0 +1,146 @@
+/*
+    black (background) - #292A2D
+    black - #232323
+    blue - #657FF1
+    white - #FAFAFA
+    grey - #919193
+    warn - #F9F871
+    success - #8BD883
+*/
+
+body {
+    background-color: #292A2D !important;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+label, small {
+    color: #FAFAFA;
+}
+
+svg {
+    height: 16px;
+    width: 16px;
+}
+
+.header {
+    font-size: 2.5rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+    color: #FAFAFA;
+}
+
+.tab-button {
+    color: #FAFAFA !important;
+    border: 2px solid #3D3E41 !important;
+    border-radius: 10px !important;
+    font-weight: bold !important;
+}
+
+.tab-button:hover, .tab-button:disabled {
+    color: #232323 !important;
+    border: 2px solid transparent !important;
+    background-color: #F9F9F9;
+}
+
+.form-group .form-control, .input-group .form-control, .form-group .form-control:read-only {
+    color: #FAFAFA;
+    background-color: #56575B;
+    border-color: #919193;
+}
+
+.form-group .form-control:focus, .input-group .form-control:focus {
+    color: #232323;
+    background-color: #FAFAFA;
+    border-color: #919193;
+}
+
+.form-group .form-control:disabled, .input-group .form-control:disabled {
+    background-color: #919193;
+    opacity: 0.2;
+}
+
+.form-group select.form-control, .input-group select.form-control {
+    cursor: pointer;
+}
+
+.input-group .input-group-append .btn {
+    color: #FAFAFA !important;
+    background-color: transparent !important;
+    border-color: #919193 !important;
+    border-left: 0 solid;
+}
+
+.input-group .input-group-append .btn:hover {
+    color: #232323 !important;
+    background-color: #FAFAFA !important;
+    border-color: transparent !important;
+}
+
+.btn svg {
+    margin-top: -0.2rem;
+}
+
+.card {
+    background-color: transparent !important;
+    border: 0 !important;
+}
+
+.card .card-header {
+    color: #232323;
+    padding: 0.75rem 1.25rem;
+    background-color: #D8A31A;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.card .card-body {
+    background-color: transparent;
+    border: 1px solid #919193;
+    border-top: 0;
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.card .card-header {
+    color: #45454D !important;
+    font-weight: bold;
+}
+
+.card .card-header span {
+    color: #45454D !important;
+}
+
+.card p, .card h5, .card li, .card span, .card a {
+    color: #FAFAFA !important;
+}
+
+.card a:hover {
+    color: #959595 !important;
+}
+
+.border-grey {
+    border: 2px solid #3D3E41 !important;
+}
+
+.tabs {
+    border-right: 1px solid #bcbcbc;
+}
+
+.tabs .row {
+    padding-bottom: 16px;
+}
+
+.horizontal-divider {
+    border-top: 1px dashed #bcbcbc;
+    padding-top: 8px;
+}
+
+.size-24 {
+    height: 24px;
+    width: 24px;
+}

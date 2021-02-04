@@ -1,20 +1,20 @@
 const actionsInfo = {
-    click:{
+    click: {
         name: 'Click',
         type: 'click',
         file: 'html/action/click.html',
     },
-    downloadImage:{
+    downloadImage: {
         name: 'Download image',
         type: 'downloadImage',
         file: 'html/action/download_image.html',
     },
-    wait:{
+    wait: {
         name: 'Wait',
         type: 'wait',
         file: 'html/action/wait.html',
     },
-    reload:{
+    reload: {
         name: 'Reload',
         type: 'reload',
         file: 'html/action/reload.html',

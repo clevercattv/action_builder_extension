@@ -1,18 +1,24 @@
-function OperationView(launchKeys = [], regExes = []) {
+async function OperationView(launchKeys = [], regExes = []) {
+    const container = await fetchFirstBodyElement('html/operation/operation_container.html');
+    const tabs = await optionsView.buildTabs(container);
+    document.body.appendChild(tabs);
+
     const elements = {
-        launchTypeSelect: document.querySelector('#launchType'),
-        launchKeysInput: document.querySelector('#launchKeys'),
-        addRegExButton: document.querySelector('#addPageRegEx'),
-        changeRegExButton: document.querySelector('#changePageRegEx'),
-        removeRegExButton: document.querySelector('#removePageRegEx'),
-        addActionButton: document.querySelector('#addAction'),
-        createOperationButton: document.querySelector('#createOperation'),
-        actionSelect: document.querySelector('#action'),
-        actionsElement: document.querySelector('#actions'),
-        regExesSelect: document.querySelector('#regExes'),
-        regExInput: document.querySelector('#pageRegEx'),
-        operationTitleInput: document.querySelector('#operationTitle'),
-        operationPriorityInput: document.querySelector('#operationPriority'),
+        tabs: tabs,
+        container: container,
+        launchTypeSelect: container.querySelector('#launchType'),
+        launchKeysInput: container.querySelector('#launchKeys'),
+        addRegExButton: container.querySelector('#addPageRegEx'),
+        changeRegExButton: container.querySelector('#changePageRegEx'),
+        removeRegExButton: container.querySelector('#removePageRegEx'),
+        addActionButton: container.querySelector('#addAction'),
+        createOperationButton: container.querySelector('#createOperation'),
+        actionSelect: container.querySelector('#action'),
+        actionsElement: container.querySelector('#actions'),
+        regExesSelect: container.querySelector('#regExes'),
+        regExInput: container.querySelector('#pageRegEx'),
+        operationTitleInput: container.querySelector('#operationTitle'),
+        operationPriorityInput: container.querySelector('#operationPriority'),
     }
 
     const fillSelect = (select, innerTexts) => {
@@ -134,12 +140,12 @@ function OperationView(launchKeys = [], regExes = []) {
 
     const createOperation = () => {
         const launchType = elements.launchTypeSelect;
-        const title = document.getElementById('operationTitle').value;
+        const title = container.querySelector('#operationTitle').value;
         const launch = 'key' === launchType.value ?
             new LaunchKeys(launchKeys) : new Launch(launchType.value);
         const actions = Array.from(elements.actionsElement.children)
             .map(htmlAction => mapper.elementToAction[htmlAction.getAttribute('data-action')](htmlAction));
-        const priority = document.getElementById('operationPriority').value;
+        const priority = container.querySelector('#operationPriority').value;
 
         return new Operation(
             title,

@@ -1,5 +1,17 @@
 window.addEventListener('load', async () => {
-    const container = document.getElementById('operations');
+    const tabs = await optionsView.buildTabs();
+
+    tabs.querySelector('#container').appendChild((() => {
+        const div = document.createElement('div');
+        div.classList.add('container');
+        const row = document.createElement('div');
+        row.classList.add('row');
+        row.id = 'operations';
+        div.appendChild(row);
+        return div;
+    })());
+    const container = tabs.querySelector('#container #operations');
+    document.body.appendChild(tabs);
 
     const recreateCards = operations => {
         container.innerHTML = '';
@@ -7,13 +19,15 @@ window.addEventListener('load', async () => {
     }
 
     async function createOperationCardElement({title, launch, regExes, actions, priority}) {
-        const card = await fetchFirstBodyElement('html/operation_card.html');
+        const card = await fetchFirstBodyElement('html/operation/operation_card.html');
 
-        const cardHeader = card.querySelector('[class*=card-header]');
-        cardHeader.innerText = `${title} [priority: ${priority}]`;
+        const cardHeaderTitle = card.querySelector('[class*=card-header] #title');
+        cardHeaderTitle.innerText = title;
+        const cardHeaderPriority = card.querySelector('[class*=card-header] #priority');
+        cardHeaderPriority.innerText = `[priority: ${priority}]`;
 
-        const cardTitle = card.querySelector('[class*=card-title]');
-        cardTitle.innerText = `Launch type: ${launch.type} ${launch.type === 'key' ? '[' + launch.keys + ']' : ''}`;
+        const launchType = card.querySelector('[class*=card-title]');
+        launchType.innerText = `Launch type: ${launch.type} ${launch.type === 'key' ? '[' + launch.keys + ']' : ''}`;
 
         const cardRegExes = card.querySelector('#regExes');
         regExes.forEach(regEx => {

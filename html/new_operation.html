@@ -7,117 +7,26 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 
-    <link type="text/css" href="../css/options.css" rel="stylesheet">
+    <link type="text/css" href="../css/style.css" rel="stylesheet">
     <link type="text/css" href="../library/bootstrap/bootstrap.css" rel="stylesheet">
 
     <script type="text/javascript" src="../library/jquery/jquery.js"></script>
     <script type="text/javascript" src="../library/bootstrap/bootstrap.js"></script>
 
-    <script type="text/javascript" src="../js/view/operation_view.js"></script>
     <script type="text/javascript" src="../js/model/action.js"></script>
     <script type="text/javascript" src="../js/model/launch.js"></script>
     <script type="text/javascript" src="../js/model/operation.js"></script>
+
     <script type="text/javascript" src="../js/content/storage.js"></script>
     <script type="text/javascript" src="../js/mapper.js"></script>
+    <script type="text/javascript" src="../js/i18n.js"></script>
     <script type="text/javascript" src="../js/file_service.js"></script>
+
+    <script type="text/javascript" src="../js/view/options_view.js"></script>
+    <script type="text/javascript" src="../js/view/operation_view.js"></script>
     <script type="text/javascript" src="../js/view/new_operation_page_view.js"></script>
 </head>
 <body>
-<div class="container">
-    <div class="h1 py-4">Action builder</div>
-    <div class="row h-100">
-        <div class="col-3 tabs">
-            <div class="container">
-                <div class="row">
-                    <a href='options.html'>
-                        Options
-                    </a>
-                </div>
-                <div class="row">
-                    Add new operation
-                </div>
-                <div class="row">
-                    <a href='operations.html'>
-                        Operations
-                    </a>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-9">
-            <div class="container">
-                <div class="row">
-                    <div class="col-9 form-group">
-                        <label for="operationTitle">Title</label>
-                        <input type="text" class="form-control" id="operationTitle">
-                    </div>
-                    <div class="col-3 form-group">
-                        <label for="operationPriority">Priority</label>
-                        <input max="99" value="1" min="1" type="number" class="form-control" id="operationPriority">
-                    </div>
-                </div>
-                <div class="row horizontal-divider">
-                    <div class="col-6">
-                        <div class="form-group">
-                            <label for="launchType">Launch type</label>
-                            <select class="form-control" id="launchType">
-                                <option value="load" selected>On page loaded</option>
-                                <option value="key">On button pressed</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="col-12 form-group">
-                            <label for="launchKeys">Launch keys</label>
-                            <input type="text" class="form-control" id="launchKeys" readonly disabled>
-                            <small>Max can hold 3 key at once</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="row horizontal-divider">
-                    <div class="col-12">
-                        <label for="pageRegEx">Add page</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="pageRegEx">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" id="addPageRegEx">Add</button>
-                            </div>
-                        </div>
-                        <small>use regex [http:\/\/.*example.com\/item-.*]</small>
-                    </div>
-                    <div class="col-12 form-group mt-2">
-                        <label for="regExes">Pages</label>
-                        <select multiple class="form-control" id="regExes"></select>
-                    </div>
-                    <div class="col-12">
-                        <button class="btn btn-secondary" id="changePageRegEx">Change</button>
-                        <button class="btn btn-danger" id="removePageRegEx">Remove</button>
-                    </div>
-                </div>
-                <div class="row horizontal-divider mt-3">
-                    <div class="col-12">
-                        <label for="action">Action</label>
-                        <div class="input-group mb-2">
-                            <select class="form-control" id="action"></select>
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" id="addAction">
-                                    Add
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" id="actions">
-
-                </div>
-                <div class="row">
-                    <button type="submit" class="btn btn-primary mb-2 ml-auto mt-1" id="createOperation">Create
-                        operation
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 </body>
 </html>
